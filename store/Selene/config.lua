@@ -10,11 +10,11 @@ conf.RUN_ON_STARTUP = true
 
 conf.command_list = {
   ['bot'] = 'I\'m a gta bot, Beep boop.',
+  ['botname'] = 'My name is Selene',
   ['ping'] = 'Pong',
   ['reee'] = 'Retard!',
   ['sender'] = '{sender}',
   ['user'] = '{user}',
-  ['botname'] = 'My name is Selene',
 }
 
 local cmd_funcs = require 'store//Selene//commandFunctions'
@@ -28,9 +28,9 @@ conf.chat_triggers = {
     triggers = {'money', 'drop'},
   },
   ['fun'] = {
-    active = true,
+    active = false,
     func = true,
-    triggers  = {'fun'},
+    triggers = {'fun'},
   },
 }
 
