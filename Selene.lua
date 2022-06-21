@@ -1,3 +1,5 @@
+util.require_natives(1651208000)
+
 local conf = require 'store//Selene//config'
 
 -----------------------
@@ -48,7 +50,10 @@ typeTable = {
   end,
   ['string'] = function(value)
     return '\''.. string.gsub(value, "'", "\\'") ..'\''
-  end
+  end,
+  ['function'] = function(value)
+    return 'true'
+  end,
 }
 
 menu.action(bot_settings, 'Save Config', {'saveBotConfig'}, 'Saves your current bot settings, text commands and chat triggers.', function()
@@ -84,6 +89,10 @@ menu.action(bot_settings, 'Save Config', {'saveBotConfig'}, 'Saves your current 
     config:write('  },\n')
   end
   config:write('}\n')
+
+  config:write('\nlocal trig_funcs = require \'store//Selene//triggerFunctions\'\n')
+
+  config:write('\nfor name, func in pairs(trig_funcs) do if conf.chat_triggers[name].func then conf.chat_triggers[name].func = func end end\n')
 
   config:write('\nreturn conf')
 
@@ -215,7 +224,7 @@ local function respondToCommand(msg)
   for cmd, res in pairs(conf.command_list) do
     if msgHasCommand(msg.txt, cmd) then
       if type(res) == 'function' then
-        res = res(msg, conf, string.match(msg.txt, ' .*'))
+        res = res(msg, conf, string.gsub(string.match(msg.txt, ' .*'), ' ', ''))
       end
       if type(res) != 'string' then return end
       chat.send_message(addPrefix(replaceNames(res, msg.pid)), getChatToRespondIn(msg.tc, conf), true, true)
@@ -234,6 +243,11 @@ local function respondToMessage(msg)
     end
 
     if matchAll then
+      if conf.chat_triggers[name].func then
+        conf.chat_triggers[name].func()
+        return
+      end
+
       local res = triggers.responses[1]
       if #triggers.responses > 1 then
         res = triggers.responses[math.random(1, #triggers.responses)]
@@ -260,7 +274,7 @@ chat.on_message(function(sender_pid, unused, message, team_chat)
     respondToCommand(msg)
   else
     respondToMessage(msg)
-  end 
+  end
 end)
 
 util.keep_running()

@@ -1,5 +1,3 @@
-util.require_natives(1651208000)
-
 local cmd_funcs = {}
 
 cmd_funcs.date = function()
@@ -58,7 +56,7 @@ cmd_funcs.settimer = function(msg, conf, param)
     local time = toTime(param)
     if time == nil then util.toast('Invalid command parameter') return end
 
-    chat.send_message('Started'.. param ..' timer' , getChatToRespondIn(msg.tc, conf), true, true)
+    chat.send_message('Started '.. param ..' timer' , getChatToRespondIn(msg.tc, conf), true, true)
     for i = time, 1, -1 do
         util.yield(1000)
     end

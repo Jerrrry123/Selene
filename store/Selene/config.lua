@@ -27,6 +27,15 @@ conf.chat_triggers = {
     responses = {'Nope', 'Money drops are detected.'},
     triggers = {'money', 'drop'},
   },
+  ['fun'] = {
+    active = true,
+    func = true,
+    triggers  = {'fun'},
+  },
 }
+
+local trig_funcs = require 'store//Selene//triggerFunctions'
+
+for name, func in pairs(trig_funcs) do if conf.chat_triggers[name].func then conf.chat_triggers[name].func = func end end
 
 return conf
