@@ -36,12 +36,12 @@ Sends your stand edition in chat.
 
 # config.lua
 
-In ´store/Selene/config.lua´ you will find my saved settings as well as text commands and chat triggers, this file gets overwritten every time my settings are saved so don't write any code here. In the responses here you can use ´{user}´ as a stand in for your own name and ´{sender}´ as a stand in for the name of the message sender.
+In `store/Selene/config.lua` you will find my saved settings as well as text commands and chat triggers, this file gets overwritten every time my settings are saved so don't write any code here. In the responses here you can use `{user}` as a stand in for your own name and `{sender}` as a stand in for the name of the message sender.
 
 # CommandFunctions.lua
 
-In ´store/Selene/commandFunctions.lua´ you will find commands that trigger function calls, the syntax for these are:
-´cmd_funcs.COMMAND_NAME = function(msg, conf, param)end´
+In `store/Selene/commandFunctions.lua` you will find commands that trigger function calls, the syntax for these are:
+`cmd_funcs.COMMAND_NAME = function(msg, conf, param)end`
 
 ### msg
 The msg parameter is a table containing txt, pid of the sender and tc if the message was sent in text chat.
