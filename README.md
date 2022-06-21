@@ -41,6 +41,7 @@ In `store/Selene/config.lua` you will find my saved settings as well as text com
 # CommandFunctions.lua
 
 In `store/Selene/commandFunctions.lua` you will find commands that trigger function calls, the syntax for these are:
+
 `cmd_funcs.COMMAND_NAME = function(msg, conf, param)end`
 
 ### msg
