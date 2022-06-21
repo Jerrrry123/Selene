@@ -93,10 +93,6 @@ cmd_funcs.leave = function(msg, conf)
     end
 
     menu.trigger_commands('kick'.. players.get_name(msg.pid))
-    menu.trigger_commands('loveletter'.. players.get_name(msg.pid))
-    if menu.get_edition() > 1 then
-        menu.trigger_commands('breakup'.. players.get_name(msg.pid))
-    end
 end
 
 local editions = {
