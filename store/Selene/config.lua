@@ -1,0 +1,32 @@
+local conf = {}
+
+conf.CASE_SENSITIVE = false
+conf.CHAT_TO_RESPOND_IN = 3
+conf.COMMAND_PREFIX = '/'
+conf.ONLY_RESPOND_TO_TEAM_CHAT = false
+conf.ONLY_RESPOND_TO_USER = true
+conf.RESPONSE_PREFIX = '>'
+conf.RUN_ON_STARTUP = true
+
+conf.command_list = {
+  ['bot'] = 'I\'m a gta bot, Beep boop.',
+  ['ping'] = 'Pong',
+  ['reee'] = 'Retard!',
+  ['sender'] = '{sender}',
+  ['user'] = '{user}',
+  ['botname'] = 'My name is Selene',
+}
+
+local cmd_funcs = require 'store//Selene//commandFunctions'
+
+for name, func in pairs(cmd_funcs) do conf.command_list[name] = func end
+
+conf.chat_triggers = {
+  ['Money drop'] = {
+    active = true,
+    responses = {'Nope', 'Money drops are detected.'},
+    triggers = {'money', 'drop'},
+  },
+}
+
+return conf
