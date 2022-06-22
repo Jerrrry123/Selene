@@ -24,13 +24,15 @@ for name, func in pairs(cmd_funcs) do conf.command_list[name] = func end
 conf.chat_triggers = {
   ['Money drop'] = {
     active = true,
+    matchAll = true,
     responses = {'Nope', 'Money drops are detected.'},
     triggers = {'money', 'drop'},
   },
-  ['fun'] = {
+  ['Censor'] = {
     active = false,
+    matchAll = false,
     func = true,
-    triggers = {'fun'},
+    triggers = {'fuck', 'bastard', 'bitch', 'cunt', 'shit', 'nigger', 'nigga'},
   },
 }
 

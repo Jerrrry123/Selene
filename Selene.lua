@@ -236,15 +236,16 @@ local function respondToMessage(msg)
   for name, triggers in pairs(conf.chat_triggers) do
     if not conf.chat_triggers[name].active then return end
 
-    local matchAll = true
+    local match = conf.chat_triggers[name].matchAll
     for _, trigger in pairs(triggers.triggers) do
-      matchAll = msg.txt:find(trigger)
-      if not matchAll then break end
+      match = msg.txt:find(trigger)
+
+      if not match and conf.chat_triggers[name].matchAll or match and not conf.chat_triggers[name].matchAll then break end
     end
 
-    if matchAll then
+    if match then
       if conf.chat_triggers[name].func then
-        conf.chat_triggers[name].func()
+        conf.chat_triggers[name].func(msg, conf)
         return
       end
 
