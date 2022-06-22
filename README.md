@@ -1,6 +1,6 @@
 # Hello, my name is Selene (\^-^ )
 
-I'm a gta chat bot written in lua, relying on the mod menu Stands lua API. I come with some pre-made commands, however my purpose is to make it easy to add new commands and chat triggers, and I will give you a quick guide on how to do so.
+I'm a gta chat bot written in lua, relying on the mod menu Stands lua API. I come with some pre-made commands. My purpose is to make it easy to add new commands and chat triggers. I will give you a quick guide on how to do so, however I can also come with spam reactions. To kick players who spam too many identical messages or send too many messages in a short amount of time.
 
 # Default commands
 
@@ -64,11 +64,38 @@ Checks if a message contains any of the words `fuck`, `bastard`, `bitch`, `cunt`
 
 In `store/Selene/config.lua` you will find my saved settings as well as text commands and chat triggers, this file gets overwritten every time my settings are saved so don't write any code here. In the responses here you can use `{user}` as a stand in for your own name and `{sender}` as a stand in for the name of the message sender.
 
-# CommandFunctions.lua
+# commandFunctions.lua
 
-In `store/Selene/commandFunctions.lua` you will find commands that trigger function calls, the syntax for these are:
+In `store/Selene/commandFunctions.lua` you will find commands that trigger function calls. Any string returned from a function like this will result in it being sent by the bot. The usage of these functions look like:
 
-`cmd_funcs.COMMAND_NAME = function(msg, conf, param)end`
+```lua
+cmd_funcs.COMMAND_NAME = function(msg, conf, param)
+    return 'Chat Response'
+end
+```
+
+# triggerFunctions.lua
+
+In `store/Selene/triggerFunctions.lua` you will find functoins that get triggered when the bot finds certain words in a message. Any string returned from a function like this will result in it being sent by the bot. The usage of these functions look like:
+
+```lua
+cmd_funcs.NAME_USED_IN_OPTION = function(msg, conf)
+    return 'Chat Response'
+end
+```
+
+Chat trigger functions also require a special entry in the `chat_triggers` table in `config.lua` in order to work. This should look something like this:
+
+```lua
+  ['NAME_USED_IN_OPTION'] = {
+    active = <bool>,
+    func = true,
+    matchAll = <bool>,
+    triggers = {<trigger strings>},
+  },
+```
+
+# parameters
 
 ### msg
 The msg parameter is a table containing txt, pid of the sender and tc if the message was sent in text chat.
@@ -77,7 +104,7 @@ The msg parameter is a table containing txt, pid of the sender and tc if the mes
 The conf parameter is a table containing the bots current settings.
 
 ### param
-The param parameter is a string that allows you to make commands that take parameters the parameter being separated from the command with a space, take /settimer for example this command takes a parameter that sets the time like ´/settimer 10min´ or ´/settimer 3sec´
+The param parameter is only passed to command functions and is a string that allows you to make commands that take parameters the parameter being separated from the command with a space, take /settimer for example this command takes a parameter that sets the time like ´/settimer 10min´ or ´/settimer 3sec´
 
 # Global functions
 

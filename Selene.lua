@@ -214,25 +214,33 @@ end
 
 local anti_spam = menu.list(my_root, 'Anti chat spam', {}, '')
 
-local identical_messages = menu.list(anti_spam, 'Identical messages', {}, '')
+menu.divider(anti_spam, 'Identical messages', {}, '')
 
-local messageTable = {}
+menu.toggle(anti_spam, 'Anti Identical Message Spam', {'antiIdenticalMessageSpam'}, '', function(toggle)
+  conf.identical_spam.active = toggle
+end, conf.identical_spam.active)
+
+menu.slider(anti_spam, 'Identical messages', {'identicalMessages'}, 'How many identical chat messages a player can send before getting kicked.', 2, 9999, conf.identical_spam.messages, 1, function(value)
+  conf.identical_spam.messages = value
+end)
+
+local identicalMessages = {}
 local function antiIdenticalSpam(msg)
     local pid = msg.pid
-    if messageTable[pid] == nil then
-        messageTable[pid] = {}
+    if identicalMessages[pid] == nil then
+      identicalMessages[pid] = {}
     end
 
-    local messageCount = (#messageTable[pid] != nil and #messageTable[pid] or 0)
-    messageTable[pid][messageCount + 1] = msg.txt
+    identicalMessages[pid][#identicalMessages[pid] + 1] = msg.txt
 
-    if #messageTable[pid] < conf.identical_spam.messages then return end
-    for i = 1, #messageTable[pid] - 1 do
-        if messageTable[pid][#messageTable[pid]] != messageTable[pid][#messageTable[pid] - i] then
-            messageTable[pid] = {}
+    if #identicalMessages[pid] < conf.identical_spam.messages then return end
+
+    for i = 1, #identicalMessages[pid] - 1 do
+        if identicalMessages[pid][#identicalMessages[pid]] != identicalMessages[pid][#identicalMessages[pid] - i] then
+          identicalMessages[pid] = {}
             return
         end
-        if i == #messageTable[pid] - 1 then
+        if i == #identicalMessages[pid] - 1 then
             local name = players.get_name(pid)
             menu.trigger_commands('kick'.. name)
             util.toast('Kicked' ..' '.. name ..' '.. 'for chat spamming identical messages.')
@@ -240,17 +248,42 @@ local function antiIdenticalSpam(msg)
     end
 end
 
-menu.toggle(identical_messages, 'Identical Message Anti Spam', {'JSignoreTeamSpam'}, '', function(toggle)
-  conf.identical_spam.active = toggle
-end, conf.identical_spam.active)
+menu.divider(anti_spam, 'Fast messages', {}, '')
 
-menu.slider(identical_messages, 'Identical messages', {'JSidenticalChatMessages'}, 'How many identical chat messages a player can send before getting kicked.', 2, 9999, conf.identical_spam.messages, 1, function(value)
-  conf.identical_spam.messages = value
+menu.toggle(anti_spam, 'Anti Fast Message Spam', {'antiFastMessageSpam'}, '', function(toggle)
+  conf.fast_spam.active = toggle
+end, conf.fast_spam.active)
+
+menu.slider(anti_spam, 'Amount of messages', {'amountOfMessages'}, 'How many chat messages a player can send in the time frame before getting kicked.', 2, 9999, conf.fast_spam.messages, 1, function(value)
+  conf.fast_spam.messages = value
 end)
 
-local fast_messages = menu.list(anti_spam, 'Fast messages', {}, '')
+menu.slider(anti_spam, 'In Time', {'inTime'}, 'The time frame in seconds of how many fast messages can be sent before the player gets kicked.', 2, 9999, conf.fast_spam.time, 1, function(value)
+  conf.fast_spam.time = value
+end)
 
+local fastMessages = {}
 local function antiFastSpam(msg)
+  local pid = msg.pid
+  if fastMessages[pid] == nil then
+    fastMessages[pid] = {}
+  end
+
+  fastMessages[pid][#fastMessages[pid] + 1] = util.current_unix_time_seconds()
+
+  if #fastMessages[pid] < conf.fast_spam.messages then return end
+
+  if fastMessages[pid][#fastMessages[pid]] - fastMessages[pid][1] <= conf.fast_spam.time then
+      local name = players.get_name(pid)
+      menu.trigger_commands('kick'.. name)
+      util.toast('Kicked' ..' '.. name ..' '.. 'for chat spamming messages too fast.')
+  else
+    local store = {}
+    for i = 2, #fastMessages[pid] do
+      store[i -1] = fastMessages[pid][i]
+    end
+    fastMessages[pid] = store
+  end
 end
 
 local gtaBot = conf.RUN_ON_STARTUP
@@ -295,6 +328,7 @@ local function respondToCommand(msg)
       if type(res) == 'function' then
         res = res(msg, conf, string.gsub(string.match(msg.txt, ' .*'), ' ', ''))
       end
+
       if type(res) != 'string' then return end
       chat.send_message(addPrefix(replaceNames(res, msg.pid)), getChatToRespondIn(msg.tc, conf), true, true)
     end
@@ -313,15 +347,17 @@ local function respondToMessage(msg)
     end
 
     if match then
+      local res
       if conf.chat_triggers[name].func then
-        conf.chat_triggers[name].func(msg, conf)
-        return
+        res = conf.chat_triggers[name].func(msg, conf)
+      else
+        local res = triggers.responses[1]
+        if #triggers.responses > 1 then
+          res = triggers.responses[math.random(1, #triggers.responses)]
+        end
       end
 
-      local res = triggers.responses[1]
-      if #triggers.responses > 1 then
-        res = triggers.responses[math.random(1, #triggers.responses)]
-      end
+      if type(res) != 'string' then return end
       chat.send_message(addPrefix(replaceNames(res, msg.pid)), getChatToRespondIn(msg.tc, conf), true, true)
       return
     end
