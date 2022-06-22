@@ -293,6 +293,14 @@ menu.toggle(my_root, 'Start Selene', {'startSelene'}, '', function(toggle)
   gtaBot = toggle
 end, gtaBot)
 
+if conf.RUN_ON_STARTUP then
+  util.show_corner_help('Waking up ~d~Selene~s~')
+end
+
+util.on_stop(function()
+  util.show_corner_help('Putting ~d~Selene~s~ to sleep')
+end)
+
 -----------------------
 -- Bot logic
 -----------------------
