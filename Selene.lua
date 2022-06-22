@@ -243,7 +243,8 @@ local function antiIdenticalSpam(msg)
         if i == #identicalMessages[pid] - 1 then
             local name = players.get_name(pid)
             menu.trigger_commands('kick'.. name)
-            util.toast('Kicked' ..' '.. name ..' '.. 'for chat spamming identical messages.')
+            util.toast('Kicked '.. name ..' for chat spamming identical messages.')
+            identicalMessages[pid] = nil
         end
     end
 end
@@ -276,7 +277,8 @@ local function antiFastSpam(msg)
   if fastMessages[pid][#fastMessages[pid]] - fastMessages[pid][1] <= conf.fast_spam.time then
       local name = players.get_name(pid)
       menu.trigger_commands('kick'.. name)
-      util.toast('Kicked' ..' '.. name ..' '.. 'for chat spamming messages too fast.')
+      util.toast('Kicked '.. name ..' for chat spamming messages too fast.')
+      fastMessages[pid] = nil
   else
     local store = {}
     for i = 2, #fastMessages[pid] do
@@ -351,7 +353,7 @@ local function respondToMessage(msg)
       if conf.chat_triggers[name].func then
         res = conf.chat_triggers[name].func(msg, conf)
       else
-        local res = triggers.responses[1]
+        res = triggers.responses[1]
         if #triggers.responses > 1 then
           res = triggers.responses[math.random(1, #triggers.responses)]
         end
