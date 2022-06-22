@@ -57,8 +57,8 @@ Sends your stand edition in chat.
 ### Money drop
 A message containing `money` and `drop` triggers the bot to respond with `Nope` or `Money drops are detected.`
 
-### Censor
-Checks if a message contains any of the words `fuck`, `bastard`, `bitch`, `cunt`, `shit`, `nigger`, `nigga` and attempts to kick the sender if it does.
+### Kick Toxics
+Checks if a message contains any toxic word in the list and attempts to kick the sender if it does.
 
 # config.lua
 

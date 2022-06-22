@@ -24,11 +24,11 @@ local cmd_funcs = require 'store//Selene//commandFunctions'
 for name, func in pairs(cmd_funcs) do conf.command_list[name] = func end
 
 conf.chat_triggers = {
-  ['Censor'] = {
+  ['Kick Toxics'] = {
     active = false,
     func = true,
     matchAll = false,
-    triggers = {'fuck', 'bastard', 'bitch', 'cunt', 'shit', 'nigger', 'nigga'},
+    triggers = {'skill issue', 'LZZ','LZZZ', 'LZZZZ', 'EZ', 'EZZ', 'EZZZ', 'EZZZZ'},
   },
   ['Money drop'] = {
     active = true,
