@@ -8,7 +8,7 @@ I'm a gta chat bot written in lua, relying on the mod menu Stands lua API. I com
 Sends `I'm a gta bot, Beep boop.`
 
 ### /ping
-Sends `Pong`.
+Sends `Pong`
 
 ### /reee
 Sends `Retard!`
@@ -16,11 +16,11 @@ Sends `Retard!`
 ### /sender
 Sends message senders name.
 
-### /user'
+### /user
 Sends your name.
 
 ### /botname
-Sends `My name is Selene`.
+Sends `My name is Selene`
 
 ### /date
 Sends the day/month/year in chat.
