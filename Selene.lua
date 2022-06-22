@@ -298,7 +298,7 @@ if conf.RUN_ON_STARTUP then
 end
 
 util.on_stop(function()
-  util.show_corner_help('Putting ~d~Selene~s~ to sleep')
+  util.show_corner_help('~d~Selene~s~ going to sleep')
 end)
 
 -----------------------
