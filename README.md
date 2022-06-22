@@ -96,4 +96,5 @@ Substitutes {user} and {sender} in the string for the respective names.
 ### function pairsByKeys(table)
 A function for iterating over a table in the alphabetical order of the keys.
 
-
+### bool is_player_friend(pid)
+Checks if a player is your friend.

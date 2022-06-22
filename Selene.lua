@@ -94,11 +94,32 @@ menu.action(bot_settings, 'Save Config', {'saveBotConfig'}, 'Saves your current 
 
   config:write('\nfor name, func in pairs(trig_funcs) do if conf.chat_triggers[name].func then conf.chat_triggers[name].func = func end end\n')
 
+  config:write('\nconf.identical_spam = {\n')
+  for k, v in pairsByKeys(conf.identical_spam) do
+    if type(v) != 'function' then
+      config:write('  '.. k ..' = '.. valueToFile(v) ..',\n')
+    end
+  end
+  config:write('}\n')
+
+  config:write('\nconf.fast_spam = {\n')
+  for k, v in pairsByKeys(conf.fast_spam) do
+    if type(v) != 'function' then
+      config:write('  '.. k ..' = '.. valueToFile(v) ..',\n')
+    end
+  end
+  config:write('}\n')
+
   config:write('\nreturn conf')
 
   config:close()
 end)
 
+menu.divider(bot_settings, 'Settings')
+
+menu.toggle(bot_settings, 'Run On Startup', {'runOnStartup'}, 'Automatically starts the bot when starting the sctipt.', function(toggle)
+  conf.RUN_ON_STARTUP = toggle
+end, conf.RUN_ON_STARTUP)
 
 menu.text_input(bot_settings, 'Command prefix', {'commandPrefix'}, '', function(input)
   conf.COMMAND_PREFIX = input
@@ -108,30 +129,33 @@ menu.text_input(bot_settings, 'Response prefix', {'responsePrefix'}, '', functio
   conf.RESPONSE_PREFIX = input
 end, conf.RESPONSE_PREFIX)
 
-menu.toggle(bot_settings, 'Run On Startup', {'runOnStartup'}, 'Automatically starts the bot when starting the sctipt.', function(toggle)
-  conf.RUN_ON_STARTUP = toggle
-end, conf.RUN_ON_STARTUP)
-
 menu.toggle(bot_settings, 'Case Sensitive', {'caseSensitive'}, '', function(toggle)
   conf.CASE_SENSITIVE = toggle
 end, conf.CASE_SENSITIVE)
 
-menu.toggle(bot_settings, 'Only Respond To Team Chat', {'caseSensitive'}, '', function(toggle)
-  conf.ONLY_RESPOND_TO_TEAM_CHAT = toggle
-end, conf.ONLY_RESPOND_TO_TEAM_CHAT)
+local respond_to_option = menu.slider_text(bot_settings, 'Chat To Respond To', {'chatToRespondTo'}, '',{[1] = 'All', [2] = 'Team', [3] = 'Any'}, function(index)
+  conf.CHAT_TO_RESPOND_TO = index
+end, conf.CHAT_TO_RESPOND_TO)
+menu.set_value(respond_to_option, conf.CHAT_TO_RESPOND_TO)
 
-local respond_option = menu.slider_text(bot_settings, 'Chat To Respond In', {'chatToRespondIn'}, '', {[1] = 'All', [2] = 'Team', [3] = 'Same'}, function(index)
+local respond_in_option = menu.slider_text(bot_settings, 'Chat To Respond In', {'chatToRespondIn'}, '', {[1] = 'All', [2] = 'Team', [3] = 'Same'}, function(index)
   conf.CHAT_TO_RESPOND_IN = index
 end)
-menu.set_value(respond_option, conf.CHAT_TO_RESPOND_IN)
+menu.set_value(respond_in_option, conf.CHAT_TO_RESPOND_IN)
 
-menu.toggle(bot_settings, 'Respond In Team Chat', {'caseSensitive'}, '', function(toggle)
-  conf.ONLY_RESPOND_IN_TEAM_CHAT = toggle
-end, conf.RESPOND_IN_TEAM_CHAT)
+menu.divider(bot_settings, 'Response Groups')
 
-menu.toggle(bot_settings, 'Only Respond To User', {'onlyRespondToUser'}, '', function(toggle)
-  conf.ONLY_RESPOND_TO_USER = toggle
-end, conf.ONLY_RESPOND_TO_USER)
+menu.toggle(bot_settings, 'Respond To User', {'respondToUser'}, '', function(toggle)
+  conf.RESPOND_TO_USER = toggle
+end, conf.RESPOND_TO_USER)
+
+menu.toggle(bot_settings, 'Respond To Friends', {'respondToFriends'}, '', function(toggle)
+  conf.RESPOND_TO_FRIENDS = toggle
+end, conf.RESPOND_TO_FRIENDS)
+
+menu.toggle(bot_settings, 'Respond To Strangers', {'respondToStrangers'}, '', function(toggle)
+  conf.RESPOND_TO_STRANGERS = toggle
+end, conf.RESPOND_TO_STRANGERS)
 
 -----------------------
 -- Commands
@@ -166,7 +190,7 @@ menu.action(command_list, 'Add New Command', {}, '', function()
   addNewCommand('new', 'Default')
 end)
 
-menu.divider(command_list, 'Commands', {}, '')
+menu.divider(command_list, 'Commands')
 
 for cmd, res in pairsByKeys(conf.command_list) do
   addNewCommand(cmd, res)
@@ -182,6 +206,51 @@ for name, tbl in pairsByKeys(conf.chat_triggers) do
   menu.toggle(chat_triggers, name, {name}, '', function(toggle)
     tbl.active = toggle
   end, tbl.active)
+end
+
+-----------------------
+-- Anti spam
+-----------------------
+
+local anti_spam = menu.list(my_root, 'Anti chat spam', {}, '')
+
+local identical_messages = menu.list(anti_spam, 'Identical messages', {}, '')
+
+local messageTable = {}
+local function antiIdenticalSpam(msg)
+    local pid = msg.pid
+    if messageTable[pid] == nil then
+        messageTable[pid] = {}
+    end
+
+    local messageCount = (#messageTable[pid] != nil and #messageTable[pid] or 0)
+    messageTable[pid][messageCount + 1] = msg.txt
+
+    if #messageTable[pid] < conf.identical_spam.messages then return end
+    for i = 1, #messageTable[pid] - 1 do
+        if messageTable[pid][#messageTable[pid]] != messageTable[pid][#messageTable[pid] - i] then
+            messageTable[pid] = {}
+            return
+        end
+        if i == #messageTable[pid] - 1 then
+            local name = players.get_name(pid)
+            menu.trigger_commands('kick'.. name)
+            util.toast('Kicked' ..' '.. name ..' '.. 'for chat spamming identical messages.')
+        end
+    end
+end
+
+menu.toggle(identical_messages, 'Identical Message Anti Spam', {'JSignoreTeamSpam'}, '', function(toggle)
+  conf.identical_spam.active = toggle
+end, conf.identical_spam.active)
+
+menu.slider(identical_messages, 'Identical messages', {'JSidenticalChatMessages'}, 'How many identical chat messages a player can send before getting kicked.', 2, 9999, conf.identical_spam.messages, 1, function(value)
+  conf.identical_spam.messages = value
+end)
+
+local fast_messages = menu.list(anti_spam, 'Fast messages', {}, '')
+
+local function antiFastSpam(msg)
 end
 
 local gtaBot = conf.RUN_ON_STARTUP
@@ -238,7 +307,7 @@ local function respondToMessage(msg)
 
     local match = conf.chat_triggers[name].matchAll
     for _, trigger in pairs(triggers.triggers) do
-      match = msg.txt:find(trigger)
+      match = msg.txt:find(replaceNames(trigger, msg.pid))
 
       if not match and conf.chat_triggers[name].matchAll or match and not conf.chat_triggers[name].matchAll then break end
     end
@@ -259,8 +328,39 @@ local function respondToMessage(msg)
   end
 end
 
+--credit to wiri (he is very cool)
+function is_player_friend(pid)
+	local pHandle = memory.alloc(104)
+	NETWORK.NETWORK_HANDLE_FROM_PLAYER(pid, pHandle, 13)
+	local isFriend = NETWORK.NETWORK_IS_HANDLE_VALID(pHandle, 13) and NETWORK.NETWORK_IS_FRIEND(pHandle)
+	return isFriend
+end
+
+local function respondToGroup(pid)
+  local isFriend = is_player_friend(pid)
+  if pid == players.user() and conf.RESPOND_TO_USER then
+    return true
+  elseif isFriend and conf.RESPOND_TO_FRIENDS then
+    return true
+  end
+
+  return not isFriend and conf.RESPOND_TO_STRANGERS
+end
+
+local function respondToChat(team_chat)
+  if conf.CHAT_TO_RESPOND_TO == 3 then
+    return true
+  elseif team_chat and conf.CHAT_TO_RESPOND_TO == 2 then
+    return true
+  end
+
+  return not team_chat and conf.CHAT_TO_RESPOND_TO == 1
+end
+
 chat.on_message(function(sender_pid, unused, message, team_chat)
-  if not gtaBot or (not team_chat and conf.ONLY_RESPOND_TO_TEAM_CHAT) or string.sub(message, 0, 1) == conf.RESPONSE_PREFIX or (sender_pid != players.user() and conf.ONLY_RESPOND_TO_USER) then return end
+  if not gtaBot or string.sub(message, 0, 1) == conf.RESPONSE_PREFIX or not respondToGroup(sender_pid) or not respondToChat(team_chat) then
+    return
+  end
 
   if not conf.CASE_SENSITIVE then
     message = message:lower()
@@ -275,6 +375,13 @@ chat.on_message(function(sender_pid, unused, message, team_chat)
     respondToCommand(msg)
   else
     respondToMessage(msg)
+  end
+
+  if conf.identical_spam.active then
+    antiIdenticalSpam(msg)
+  end
+  if conf.fast_spam.active then
+    antiFastSpam(msg)
   end
 end)
 

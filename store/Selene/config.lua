@@ -2,9 +2,11 @@ local conf = {}
 
 conf.CASE_SENSITIVE = false
 conf.CHAT_TO_RESPOND_IN = 3
+conf.CHAT_TO_RESPOND_TO = 3
 conf.COMMAND_PREFIX = '/'
-conf.ONLY_RESPOND_TO_TEAM_CHAT = false
-conf.ONLY_RESPOND_TO_USER = true
+conf.RESPOND_TO_FRIENDS = false
+conf.RESPOND_TO_STRANGERS = false
+conf.RESPOND_TO_USER = true
 conf.RESPONSE_PREFIX = '>'
 conf.RUN_ON_STARTUP = true
 
@@ -22,22 +24,33 @@ local cmd_funcs = require 'store//Selene//commandFunctions'
 for name, func in pairs(cmd_funcs) do conf.command_list[name] = func end
 
 conf.chat_triggers = {
+  ['Censor'] = {
+    active = false,
+    func = true,
+    matchAll = false,
+    triggers = {'fuck', 'bastard', 'bitch', 'cunt', 'shit', 'nigger', 'nigga'},
+  },
   ['Money drop'] = {
     active = true,
     matchAll = true,
     responses = {'Nope', 'Money drops are detected.'},
     triggers = {'money', 'drop'},
   },
-  ['Censor'] = {
-    active = false,
-    matchAll = false,
-    func = true,
-    triggers = {'fuck', 'bastard', 'bitch', 'cunt', 'shit', 'nigger', 'nigga'},
-  },
 }
 
 local trig_funcs = require 'store//Selene//triggerFunctions'
 
 for name, func in pairs(trig_funcs) do if conf.chat_triggers[name].func then conf.chat_triggers[name].func = func end end
+
+conf.identical_spam = {
+  active = false,
+  messages = 5,
+}
+
+conf.fast_spam = {
+  active = false,
+  messages = 5,
+  time = 5,
+}
 
 return conf
