@@ -30,11 +30,17 @@ conf.chat_triggers = {
     matchAll = false,
     triggers = {'skill issue', 'LZZ','LZZZ', 'LZZZZ', 'EZ', 'EZZ', 'EZZZ', 'EZZZZ'},
   },
-  ['Money drop'] = {
+  ['Money Drop'] = {
     active = true,
     matchAll = true,
     responses = {'Nope', 'Money drops are detected.'},
     triggers = {'money', 'drop'},
+  },
+  ['Stand Promotion'] = {
+    active = false,
+    matchAll = true,
+    responses = {'Yes, I\'m using Stand, you can find it at stand.gg'},
+    triggers = {'{user}', 'modding'},
   },
 }
 

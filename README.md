@@ -60,6 +60,10 @@ A message containing `money` and `drop` triggers the bot to respond with `Nope` 
 ### Kick Toxics
 Checks if a message contains any toxic word in the list and attempts to kick the sender if it does.
 
+### Stand Promotion
+Checks if a message contains your name and `modding`, if it does the bot responds with `Yes, I\'m using Stand, you can find it at stand.gg`
+
+
 # config.lua
 
 In `store/Selene/config.lua` you will find my saved settings as well as text commands and chat triggers, this file gets overwritten every time my settings are saved so don't write any code here. In the responses here you can use `{user}` as a stand in for your own name and `{sender}` as a stand in for the name of the message sender.

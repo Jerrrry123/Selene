@@ -343,7 +343,11 @@ local function respondToMessage(msg)
 
     local match = conf.chat_triggers[name].matchAll
     for _, trigger in pairs(triggers.triggers) do
-      match = msg.txt:find(replaceNames(trigger, msg.pid))
+      if not conf.CASE_SENSITIVE then
+        match = msg.txt:find(string.lower(replaceNames(trigger, msg.pid)))
+      else
+        match = msg.txt:find(replaceNames(trigger, msg.pid))
+      end
 
       if not match and conf.chat_triggers[name].matchAll or match and not conf.chat_triggers[name].matchAll then break end
     end
