@@ -289,7 +289,7 @@ local function antiFastSpam(msg)
 end
 
 local gtaBot = conf.RUN_ON_STARTUP
-menu.toggle(my_root, 'Turn On Bot', {'bot'}, '', function(toggle)
+menu.toggle(my_root, 'Start Selene', {'startSelene'}, '', function(toggle)
   gtaBot = toggle
 end, gtaBot)
 
