@@ -57,6 +57,9 @@ Sends your stand edition in chat.
 ### Money drop
 A message containing `money` and `drop` triggers the bot to respond with `Nope` or `Money drops are detected.`
 
+### Censor
+Checks if a message contains any of the words `fuck`, `bastard`, `bitch`, `cunt`, `shit`, `nigger`, `nigga` and attempts to kick the sender if it does.
+
 # config.lua
 
 In `store/Selene/config.lua` you will find my saved settings as well as text commands and chat triggers, this file gets overwritten every time my settings are saved so don't write any code here. In the responses here you can use `{user}` as a stand in for your own name and `{sender}` as a stand in for the name of the message sender.
