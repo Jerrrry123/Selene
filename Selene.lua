@@ -12,10 +12,10 @@ function pairsByKeys(t, f)
   table.sort(a, f)
   local i = 0
   local iter = function()
-      i += 1
-      if a[i] == nil then return nil
-      else return a[i], t[a[i]]
-      end
+    i += 1
+    if a[i] == nil then return nil
+    else return a[i], t[a[i]]
+    end
   end
   return iter
 end
@@ -226,27 +226,27 @@ end)
 
 local identicalMessages = {}
 local function antiIdenticalSpam(msg)
-    local pid = msg.pid
-    if identicalMessages[pid] == nil then
+  local pid = msg.pid
+  if identicalMessages[pid] == nil then
+    identicalMessages[pid] = {}
+  end
+
+  identicalMessages[pid][#identicalMessages[pid] + 1] = msg.txt
+
+  if #identicalMessages[pid] < conf.identical_spam.messages then return end
+
+  for i = 1, #identicalMessages[pid] - 1 do
+    if identicalMessages[pid][#identicalMessages[pid]] != identicalMessages[pid][#identicalMessages[pid] - i] then
       identicalMessages[pid] = {}
+        return
     end
-
-    identicalMessages[pid][#identicalMessages[pid] + 1] = msg.txt
-
-    if #identicalMessages[pid] < conf.identical_spam.messages then return end
-
-    for i = 1, #identicalMessages[pid] - 1 do
-        if identicalMessages[pid][#identicalMessages[pid]] != identicalMessages[pid][#identicalMessages[pid] - i] then
-          identicalMessages[pid] = {}
-            return
-        end
-        if i == #identicalMessages[pid] - 1 then
-            local name = players.get_name(pid)
-            menu.trigger_commands('kick'.. name)
-            util.toast('Kicked '.. name ..' for chat spamming identical messages.')
-            identicalMessages[pid] = nil
-        end
+    if i == #identicalMessages[pid] - 1 then
+      local name = players.get_name(pid)
+      menu.trigger_commands('kick'.. name)
+      util.toast('Kicked '.. name ..' for chat spamming identical messages.')
+      identicalMessages[pid] = nil
     end
+  end
 end
 
 menu.divider(anti_spam, 'Fast messages', {}, '')
@@ -275,10 +275,10 @@ local function antiFastSpam(msg)
   if #fastMessages[pid] < conf.fast_spam.messages then return end
 
   if fastMessages[pid][#fastMessages[pid]] - fastMessages[pid][1] <= conf.fast_spam.time then
-      local name = players.get_name(pid)
-      menu.trigger_commands('kick'.. name)
-      util.toast('Kicked '.. name ..' for chat spamming messages too fast.')
-      fastMessages[pid] = nil
+    local name = players.get_name(pid)
+    menu.trigger_commands('kick'.. name)
+    util.toast('Kicked '.. name ..' for chat spamming messages too fast.')
+    fastMessages[pid] = nil
   else
     local store = {}
     for i = 2, #fastMessages[pid] do
