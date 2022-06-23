@@ -214,7 +214,7 @@ end
 -- Anti spam
 -----------------------
 
-local anti_spam = menu.list(my_root, 'Anti chat spam', {}, '')
+local anti_spam = menu.list(my_root, 'Anti Chat Spam', {}, '')
 
 menu.divider(anti_spam, 'Identical messages', {}, '')
 
@@ -222,7 +222,7 @@ menu.toggle(anti_spam, 'Anti Identical Message Spam', {'antiIdenticalMessageSpam
   conf.identical_spam.active = toggle
 end, conf.identical_spam.active)
 
-menu.slider(anti_spam, 'Identical messages', {'identicalMessages'}, 'How many identical chat messages a player can send before getting kicked.', 2, 9999, conf.identical_spam.messages, 1, function(value)
+menu.slider(anti_spam, 'Identical Messages', {'identicalMessages'}, 'How many identical chat messages a player can send before getting kicked.', 2, 9999, conf.identical_spam.messages, 1, function(value)
   conf.identical_spam.messages = value
 end)
 
@@ -251,13 +251,13 @@ local function antiIdenticalSpam(msg)
   end
 end
 
-menu.divider(anti_spam, 'Fast messages', {}, '')
+menu.divider(anti_spam, 'Fast Messages', {}, '')
 
 menu.toggle(anti_spam, 'Anti Fast Message Spam', {'antiFastMessageSpam'}, '', function(toggle)
   conf.fast_spam.active = toggle
 end, conf.fast_spam.active)
 
-menu.slider(anti_spam, 'Amount of messages', {'amountOfMessages'}, 'How many chat messages a player can send in the time frame before getting kicked.', 2, 9999, conf.fast_spam.messages, 1, function(value)
+menu.slider(anti_spam, 'Amount Of Messages', {'amountOfMessages'}, 'How many chat messages a player can send in the time frame before getting kicked.', 2, 9999, conf.fast_spam.messages, 1, function(value)
   conf.fast_spam.messages = value
 end)
 
@@ -289,6 +289,51 @@ local function antiFastSpam(msg)
     fastMessages[pid] = store
   end
 end
+
+-----------------------
+-- Message history
+-----------------------
+
+local justPressed = {}
+function is_key_just_down(keyCode)
+    local isDown = util.is_key_down(keyCode)
+
+    if isDown and not justPressed[keyCode] then
+        justPressed[keyCode] = true
+        return true
+    elseif not isDown then
+        justPressed[keyCode] = false
+    end
+    return false
+end
+
+local last_message = {}
+local index = 1
+menu.toggle_loop(my_root, 'Message History', {}, 'Lets you scroll through sent messages with up/down arrow keys.', function()
+  if chat.is_open() and is_key_just_down(0x26) then --up
+    if index > 1 then
+      index -= 1
+    end
+    chat.remove_from_draft(#chat.get_draft())
+    chat.add_to_draft(last_message[index])
+  end
+
+  if chat.is_open() and is_key_just_down(0x28) then --down
+    if index <= #last_message then
+      index += 1
+    end
+    chat.remove_from_draft(#chat.get_draft())
+    chat.add_to_draft(index == #last_message + 1 and '' or last_message[index])
+  end
+
+  if not chat.is_open() then
+    index = #last_message + 1
+  end
+end)
+
+-----------------------
+-- Start / Stop
+-----------------------
 
 local gtaBot = conf.RUN_ON_STARTUP
 menu.toggle(my_root, 'Start Selene', {'startSelene'}, '', function(toggle)
@@ -418,6 +463,11 @@ local function respondToChat(team_chat)
 end
 
 chat.on_message(function(sender_pid, unused, message, team_chat)
+  if sender_pid == players.user() and string.sub(message, 0, #conf.RESPONSE_PREFIX) != conf.RESPONSE_PREFIX then
+    last_message[#last_message + 1] = message
+    index = #last_message + 1
+  end
+
   if not gtaBot or string.sub(message, 0, #conf.RESPONSE_PREFIX) == conf.RESPONSE_PREFIX or not respondToGroup(sender_pid) or not respondToChat(team_chat) then
     return
   end
