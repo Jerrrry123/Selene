@@ -168,14 +168,16 @@ local function addNewCommand(command, response)
   local list = menu.list(command_list, command, {}, '')
   local cmd = command
 
-  menu.text_input(list, 'Command', {cmd ..'cmd'}, '', function(input)
+  local cmd_command cmd_command = menu.text_input(list, 'Command', {cmd ..'cmd'}, '', function(input)
     conf.command_list[input] = conf.command_list[cmd]
     cmd = input
     menu.set_menu_name(list, input)
+    menu.set_command_names(cmd_command, {input ..'cmd'})
     conf.command_list[command] = nil
   end, command)
 
-  menu.text_input(list, 'Response', {cmd ..'res'}, '', function(input)
+  local res_command res_command = menu.text_input(list, 'Response', {cmd ..'res'}, '', function(input)
+    menu.set_command_names(res_command, {input ..'res'})
     conf.command_list[cmd] = input
   end, response)
 
