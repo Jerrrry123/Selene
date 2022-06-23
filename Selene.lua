@@ -329,18 +329,28 @@ local function msgHasCommand(msg, cmd)
   if not conf.CASE_SENSITIVE then
     cmd = cmd:lower()
   end
-  return string.sub(msg, 2, #cmd + 1) == cmd and (#msg == #cmd + 1 or string.sub(msg, #cmd + 2, #cmd + 2) == ' ')
+  msg = string.sub(msg, #conf.RESPONSE_PREFIX + 1, #msg)
+  return msg == cmd or msg:find(cmd) and string.sub(msg, #cmd + 1, #cmd + 1) == ' '
 end
 
 local function respondToCommand(msg)
   for cmd, res in pairs(conf.command_list) do
     if msgHasCommand(msg.txt, cmd) then
       if type(res) == 'function' then
-        res = res(msg, conf, string.gsub(string.match(msg.txt, ' .*'), ' ', ''))
+
+        local param = string.match(msg.txt, cmd ..' .*')
+        if param ~= nil then
+            param = string.gsub(param, cmd ..' ', '')
+        end
+
+        util.toast(param)
+
+        res = res(msg, conf, param)
       end
 
       if type(res) != 'string' then return end
       chat.send_message(addPrefix(replaceNames(res, msg.pid)), getChatToRespondIn(msg.tc, conf), true, true)
+      return
     end
   end
 end
@@ -421,7 +431,7 @@ chat.on_message(function(sender_pid, unused, message, team_chat)
   msg.pid = sender_pid
   msg.tc = team_chat
 
-  if string.sub(message, 0, #conf.RESPONSE_PREFIX) == conf.COMMAND_PREFIX then
+  if string.sub(message, 0, #conf.COMMAND_PREFIX) == conf.COMMAND_PREFIX then
     respondToCommand(msg)
   else
     respondToMessage(msg)
