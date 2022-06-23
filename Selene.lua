@@ -345,8 +345,6 @@ local function respondToCommand(msg)
             param = string.gsub(param, cmd ..' ', '')
         end
 
-        util.toast(param)
-
         res = res(msg, conf, param)
       end
 
