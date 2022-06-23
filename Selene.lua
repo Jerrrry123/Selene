@@ -357,7 +357,7 @@ local function respondToMessage(msg)
         match = msg.txt:find(replaceNames(trigger, msg.pid))
       end
 
-      if not match and conf.chat_triggers[name].matchAll or match and not conf.chat_triggers[name].matchAll then break end
+      if (not match and conf.chat_triggers[name].matchAll) or (match and not conf.chat_triggers[name].matchAll) then break end
     end
 
     if match then
@@ -408,7 +408,7 @@ local function respondToChat(team_chat)
 end
 
 chat.on_message(function(sender_pid, unused, message, team_chat)
-  if not gtaBot or string.sub(message, 0, 1) == conf.RESPONSE_PREFIX or not respondToGroup(sender_pid) or not respondToChat(team_chat) then
+  if not gtaBot or string.sub(message, 0, #conf.RESPONSE_PREFIX) == conf.RESPONSE_PREFIX or not respondToGroup(sender_pid) or not respondToChat(team_chat) then
     return
   end
 
@@ -421,7 +421,7 @@ chat.on_message(function(sender_pid, unused, message, team_chat)
   msg.pid = sender_pid
   msg.tc = team_chat
 
-  if string.sub(message, 0, 1) == conf.COMMAND_PREFIX then
+  if string.sub(message, 0, #conf.RESPONSE_PREFIX) == conf.COMMAND_PREFIX then
     respondToCommand(msg)
   else
     respondToMessage(msg)
