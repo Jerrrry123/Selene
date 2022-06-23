@@ -133,6 +133,10 @@ menu.toggle(bot_settings, 'Case Sensitive', {'caseSensitive'}, '', function(togg
   conf.CASE_SENSITIVE = toggle
 end, conf.CASE_SENSITIVE)
 
+menu.toggle(bot_settings, 'Message history', {'messageHistory'}, 'Lets you scroll through sent messages while chat is open with your up/down arrow keys.', function(toggle)
+  conf.MESSAGE_HISTORY = toggle
+end, conf.MESSAGE_HISTORY)
+
 local respond_to_option = menu.slider_text(bot_settings, 'Chat To Respond To', {'chatToRespondTo'}, '',{[1] = 'All', [2] = 'Team', [3] = 'Any'}, function(index)
   conf.CHAT_TO_RESPOND_TO = index
 end, conf.CHAT_TO_RESPOND_TO)
@@ -295,11 +299,30 @@ local function antiFastSpam(msg)
 end
 
 -----------------------
+-- Start / Stop
+-----------------------
+
+local awake = conf.RUN_ON_STARTUP
+menu.toggle(my_root, 'Start Selene', {'startSelene'}, '', function(toggle)
+  awake = toggle
+end, awake)
+
+if conf.RUN_ON_STARTUP then
+  util.show_corner_help('Waking up ~d~Selene~s~')
+end
+
+util.on_stop(function()
+  if gtaBot then
+    util.show_corner_help('~d~Selene~s~ going to sleep')
+  end
+end)
+
+-----------------------
 -- Message history
 -----------------------
 
 local justPressed = {}
-function is_key_just_down(keyCode)
+local function is_key_just_down(keyCode)
     local isDown = util.is_key_down(keyCode)
 
     if isDown and not justPressed[keyCode] then
@@ -313,7 +336,9 @@ end
 
 local last_message = {}
 local index = 1
-menu.toggle_loop(my_root, 'Message History', {}, 'Lets you scroll through sent messages with up/down arrow keys.', function()
+util.create_tick_handler(function()
+  if not conf.MESSAGE_HISTORY then return end
+
   if chat.is_open() and is_key_just_down(0x26) then --up
     if index > 1 then
       index -= 1
@@ -333,23 +358,6 @@ menu.toggle_loop(my_root, 'Message History', {}, 'Lets you scroll through sent m
   if not chat.is_open() then
     index = #last_message + 1
   end
-end)
-
------------------------
--- Start / Stop
------------------------
-
-local gtaBot = conf.RUN_ON_STARTUP
-menu.toggle(my_root, 'Start Selene', {'startSelene'}, '', function(toggle)
-  gtaBot = toggle
-end, gtaBot)
-
-if conf.RUN_ON_STARTUP then
-  util.show_corner_help('Waking up ~d~Selene~s~')
-end
-
-util.on_stop(function()
-  util.show_corner_help('~d~Selene~s~ going to sleep')
 end)
 
 -----------------------
@@ -472,7 +480,7 @@ chat.on_message(function(sender_pid, unused, message, team_chat)
     index = #last_message + 1
   end
 
-  if not gtaBot or string.sub(message, 0, #conf.RESPONSE_PREFIX) == conf.RESPONSE_PREFIX or not respondToGroup(sender_pid) or not respondToChat(team_chat) then
+  if not awake or string.sub(message, 0, #conf.RESPONSE_PREFIX) == conf.RESPONSE_PREFIX or not respondToGroup(sender_pid) or not respondToChat(team_chat) then
     return
   end
 
@@ -502,5 +510,3 @@ chat.on_message(function(sender_pid, unused, message, team_chat)
     antiFastSpam(msg)
   end
 end)
-
-util.keep_running()

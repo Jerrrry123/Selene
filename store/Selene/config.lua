@@ -4,12 +4,13 @@ conf.CASE_SENSITIVE = false
 conf.CHAT_TO_RESPOND_IN = 3
 conf.CHAT_TO_RESPOND_TO = 3
 conf.COMMAND_PREFIX = '/'
+conf.MESSAGE_HISTORY = true
 conf.RESPOND_TO_FRIENDS = false
 conf.RESPOND_TO_STRANGERS = false
 conf.RESPOND_TO_USER = true
+conf.RESPONSE_DELAY = 0
 conf.RESPONSE_PREFIX = '>'
 conf.RUN_ON_STARTUP = true
-conf.RESPONSE_DELAY = 0
 
 conf.command_list = {
   ['bot'] = 'I\'m a gta bot, Beep boop.',
@@ -29,7 +30,7 @@ conf.chat_triggers = {
     active = false,
     func = true,
     matchAll = false,
-    triggers = {'skill issue', 'LZZ','LZZZ', 'LZZZZ', 'EZ', 'EZZ', 'EZZZ', 'EZZZZ'},
+    triggers = {'skill issue', 'LZZ', 'LZZZ', 'LZZZZ', 'EZ', 'EZZ', 'EZZZ', 'EZZZZ'},
   },
   ['Money Drop'] = {
     active = true,
