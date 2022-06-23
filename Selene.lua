@@ -143,6 +143,10 @@ local respond_in_option = menu.slider_text(bot_settings, 'Chat To Respond In', {
 end)
 menu.set_value(respond_in_option, conf.CHAT_TO_RESPOND_IN)
 
+menu.slider(bot_settings, 'Response Delay', {'responseDelay'}, '', 0, 60, conf.RESPONSE_DELAY, 1, function(value)
+  conf.RESPONSE_DELAY = value
+end)
+
 menu.divider(bot_settings, 'Response Groups')
 
 menu.toggle(bot_settings, 'Respond To User', {'respondToUser'}, '', function(toggle)
@@ -261,7 +265,7 @@ menu.slider(anti_spam, 'Amount Of Messages', {'amountOfMessages'}, 'How many cha
   conf.fast_spam.messages = value
 end)
 
-menu.slider(anti_spam, 'In Time', {'inTime'}, 'The time frame in seconds of how many fast messages can be sent before the player gets kicked.', 2, 9999, conf.fast_spam.time, 1, function(value)
+menu.slider(anti_spam, 'In Time', {'inTime'}, 'The time frame in seconds of how many fast messages can be sent before the player gets kicked.', 1, 9999, conf.fast_spam.time, 1, function(value)
   conf.fast_spam.time = value
 end)
 
@@ -480,6 +484,10 @@ chat.on_message(function(sender_pid, unused, message, team_chat)
   msg.txt = message
   msg.pid = sender_pid
   msg.tc = team_chat
+
+  if conf.RESPONSE_DELAY > 0 then
+    util.yield(conf.RESPONSE_DELAY * 1000)
+  end
 
   if string.sub(message, 0, #conf.COMMAND_PREFIX) == conf.COMMAND_PREFIX then
     respondToCommand(msg)

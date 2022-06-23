@@ -9,6 +9,7 @@ conf.RESPOND_TO_STRANGERS = false
 conf.RESPOND_TO_USER = true
 conf.RESPONSE_PREFIX = '>'
 conf.RUN_ON_STARTUP = true
+conf.RESPONSE_DELAY = 0
 
 conf.command_list = {
   ['bot'] = 'I\'m a gta bot, Beep boop.',
