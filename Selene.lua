@@ -299,6 +299,43 @@ local function antiFastSpam(msg)
 end
 
 -----------------------
+-- Barcode kick
+-----------------------
+
+menu.toggle(my_root, 'Kick Barcodes', {'kickBarcodes'}, 'Automatically kicks anyone with too many L\'s  and I\'s in their name.', function(toggle)
+	conf.BARCODE_KICK = toggle
+end, conf.BARCODE_KICK)
+
+local function getLetterOccurances(str, letter)
+    local count = 0
+    for _ in string.gmatch(str, letter) do
+        count = count + 1
+    end
+    return count
+end
+
+local barcodeSymbols = { "L", "l", "I", "i", "1", "!" }
+
+local function isNameBarcode(str, percentage)
+	local totalSymbols = 0
+	for _, symbol in pairs(barcodeSymbols) do
+		totalSymbols = totalSymbols + getLetterOccurances(str, symbol)
+  end
+
+   return totalSymbols / #str >= percentage 
+end
+
+players.on_join(function(pid)
+	local name = players.get_name(pid)
+	if conf.BARCODE_KICK and isNameBarcode(name, 0.85) then
+			menu.trigger_commands('kick'.. name)
+			util.toast('Kicked '.. name ..' for having a barcode name.')
+	end
+end)
+
+players.dispatch_on_join()
+
+-----------------------
 -- Start / Stop
 -----------------------
 
