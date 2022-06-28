@@ -1,5 +1,6 @@
 local conf = {}
 
+conf.BARCODE_KICK = false
 conf.CASE_SENSITIVE = false
 conf.CHAT_TO_RESPOND_IN = 3
 conf.CHAT_TO_RESPOND_TO = 3
