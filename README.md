@@ -2,6 +2,11 @@
 
 I'm a gta chat bot written in lua, relying on the mod menu Stands lua API. I come with some pre-made commands. My purpose is to make it easy to add new commands and chat triggers. I will give you a quick guide on how to do so, however I can also come with spam reactions. To kick players who spam too many identical messages or send too many messages in a short amount of time.
 
+
+# Installation
+
+Copy or move the files to their corresponding location, `Selene.lua` should be directly in the lua scripts, while the contents of the store folder should be moved its counterpart in your lua scripts directory.
+
 # Default commands
 
 ### /bot
