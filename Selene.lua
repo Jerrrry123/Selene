@@ -324,6 +324,10 @@ end
 players.on_join(function(pid)
 	local name = players.get_name(pid)
 	if conf.BARCODE_KICK and isNameBarcode(name, 0.85) then
+    while util.is_session_transition_active() or not NETWORK.NETWORK_IS_PLAYER_ACTIVE(players.user()) do
+      util.yield()
+    end
+
     menu.trigger_commands('kick'.. name)
     util.toast('Kicked '.. name ..' for having a barcode name.')
 	end
@@ -345,7 +349,7 @@ if conf.RUN_ON_STARTUP then
 end
 
 util.on_stop(function()
-  if gtaBot then
+  if awake then
     util.show_corner_help('~d~Selene~s~ going to sleep')
   end
 end)
