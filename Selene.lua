@@ -306,12 +306,8 @@ menu.toggle(my_root, 'Kick Barcodes', {'kickBarcodes'}, 'Automatically kicks any
 	conf.BARCODE_KICK = toggle
 end, conf.BARCODE_KICK)
 
-local function getLetterOccurances(str, letter)
-    local count = 0
-    for _ in string.gmatch(str, letter) do
-        count = count + 1
-    end
-    return count
+local function count(str, pattern)
+  return select(2, string.gsub(str, pattern, ""))
 end
 
 local barcodeSymbols = { "L", "l", "I", "i", "1", "!" }
@@ -319,17 +315,17 @@ local barcodeSymbols = { "L", "l", "I", "i", "1", "!" }
 local function isNameBarcode(str, percentage)
 	local totalSymbols = 0
 	for _, symbol in pairs(barcodeSymbols) do
-		totalSymbols = totalSymbols + getLetterOccurances(str, symbol)
+		totalSymbols += count(str, symbol)
   end
 
-   return totalSymbols / #str >= percentage 
+  return totalSymbols / #str >= percentage
 end
 
 players.on_join(function(pid)
 	local name = players.get_name(pid)
 	if conf.BARCODE_KICK and isNameBarcode(name, 0.85) then
-			menu.trigger_commands('kick'.. name)
-			util.toast('Kicked '.. name ..' for having a barcode name.')
+    menu.trigger_commands('kick'.. name)
+    util.toast('Kicked '.. name ..' for having a barcode name.')
 	end
 end)
 
