@@ -374,7 +374,7 @@ end
 local last_message = {}
 local index = 1
 util.create_tick_handler(function()
-  if not conf.MESSAGE_HISTORY then return end
+  if not conf.MESSAGE_HISTORY or #last_message == 0 then return end
 
   if chat.is_open() and is_key_just_down(0x26) then --up
     if index > 1 then
