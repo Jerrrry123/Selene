@@ -139,7 +139,7 @@ end, conf.MESSAGE_HISTORY)
 
 local respond_to_option = menu.slider_text(bot_settings, 'Chat To Respond To', {'chatToRespondTo'}, '',{[1] = 'All', [2] = 'Team', [3] = 'Any'}, function(index)
   conf.CHAT_TO_RESPOND_TO = index
-end, conf.CHAT_TO_RESPOND_TO)
+end)
 menu.set_value(respond_to_option, conf.CHAT_TO_RESPOND_TO)
 
 local respond_in_option = menu.slider_text(bot_settings, 'Chat To Respond In', {'chatToRespondIn'}, '', {[1] = 'All', [2] = 'Team', [3] = 'Same'}, function(index)
