@@ -78,7 +78,7 @@ In `store/Selene/config.lua` you will find my saved settings as well as text com
 In `store/Selene/commandFunctions.lua` you will find commands that trigger function calls. Any string returned from a function like this will result in it being sent by the bot. The usage of these functions look like:
 
 ```lua
-cmd_funcs.COMMAND_NAME = function(msg, conf, param)
+cmd_funcs.COMMAND_NAME = function(msg, conf, params)
     return 'Chat Response'
 end
 ```
@@ -107,13 +107,19 @@ Chat trigger functions also require a special entry in the `chat_triggers` table
 # parameters
 
 ### msg
-The msg parameter is a table containing txt, pid of the sender and tc if the message was sent in text chat.
+The msg parameter is a table containing: txt, pid of the sender and tc, a boolean indicating if the message was sent in text chat or not.
 
 ### conf
 The conf parameter is a table containing the bots current settings.
 
-### param
-The param parameter is only passed to command functions and is a string that allows you to make commands that take parameters the parameter being separated from the command with a space, take /settimer for example this command takes a parameter that sets the time like ´/settimer 10min´ or ´/settimer 3sec´
+### params
+The params parameter is only passed to command functions and is a table that contains strings, that are seperated by spaces. This allows you to make commands that take parameters, take /settimer for example this command takes a parameter that sets the time like ´/settimer 10min´ or ´/settimer 3sec´, the parameter that would be passed in this case would be as follows:
+
+```lua
+{
+  '3sec'
+}
+```
 
 # Global functions
 
@@ -121,9 +127,9 @@ In this functions file you can also access functions from the bot main bot file 
 
 
 ### string addPrefix(string)
-Adds the bots message prefix to the beginning of the string.
+Adds the bots message prefix to the beginning of the string, then returns the result.
 
-### bool getChatToRespondIn(sent_in_team_chat, conf)
+### bool getChatToRespondIn(sent_in_team_chat)
 Returns a boolean of whether or not the bots response should be sent in team chat.
 
 ### string replaceNames(string, sender_pid)

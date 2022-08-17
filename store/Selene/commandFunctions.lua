@@ -14,20 +14,23 @@ end
 
 cmd_funcs.clear = function(msg, conf)
   for i = 0, 10 do
-  chat.send_message('_', getChatToRespondIn(msg.tc, conf), true, true)
+  chat.send_message('_', getChatToRespondIn(msg.tc), true, true)
   end
 end
 
-cmd_funcs.countdown = function(msg, conf, param)
-  param = tonumber(param)
-  if type(param) != 'number' then util.toast('Invalid command parameter') return end
-
-  for i = param, 1, -1 do
-  chat.send_message(addPrefix(i), getChatToRespondIn(msg.tc, conf), true, true)
-  AUDIO.PLAY_SOUND_FROM_ENTITY(-1, 'Checkpoint', PLAYER.GET_PLAYER_PED(msg.pid), 'Car_Club_Races_Sprint_Challenge_Sounds', true, true)
-  util.yield(1000)
+cmd_funcs.countdown = function(msg, conf, params)
+  params = tonumber(params[1])
+  if type(params) != 'number' then
+    util.toast('Invalid command parameter')
+    return
   end
-  AUDIO.PLAY_SOUND_FROM_ENTITY(-1, 'Checkpoint_Finish_Winner', PLAYER.GET_PLAYER_PED(msg.pid), 'DLC_Tuner_Car_Meet_Test_Area_Events_Sounds', true, true)
+
+  for i = params, 1, -1 do
+    chat.send_message(addPrefix(i), getChatToRespondIn(msg.tc), true, true)
+    AUDIO.PLAY_SOUND_FROM_ENTITY(-1, 'Checkpoint', PLAYER.GET_PLAYER_PED(msg.pid), 'Car_Club_Races_Sprint_Challenge_Sounds', true, true)
+    util.yield(1000)
+  end
+    AUDIO.PLAY_SOUND_FROM_ENTITY(-1, 'Checkpoint_Finish_Winner', PLAYER.GET_PLAYER_PED(msg.pid), 'DLC_Tuner_Car_Meet_Test_Area_Events_Sounds', true, true)
   return 'Goooo!'
 end
 
@@ -52,15 +55,18 @@ local function toTime(time)
   return time
 end
 
-cmd_funcs.settimer = function(msg, conf, param)
-  local time = toTime(param)
-  if time == nil then util.toast('Invalid command parameter') return end
+cmd_funcs.settimer = function(msg, conf, params)
+  if params == nil then
+    util.toast('Invalid command parameter')
+    return
+  end
+  local time = toTime(params[1])
 
-  chat.send_message('Started '.. param ..' timer' , getChatToRespondIn(msg.tc, conf), true, true)
+  chat.send_message('Started '.. params[1] ..' timer' , getChatToRespondIn(msg.tc), true, true)
   for i = time, 1, -1 do
   util.yield(1000)
   end
-  return players.get_name(msg.pid) ..'\'s '..  param ..' timer just ended!'
+  return players.get_name(msg.pid) ..'\'s '..  params[1] ..' timer just ended!'
 end
 
 cmd_funcs.help = function(msg, conf)

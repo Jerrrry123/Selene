@@ -406,11 +406,11 @@ function replaceNames(msg, sender_pid)
   return string.gsub(msg, '{sender}', players.get_name(sender_pid))
 end
 
-function getChatToRespondIn(team_chat, c)
-  if c.CHAT_TO_RESPOND_IN == 3 then
+function getChatToRespondIn(team_chat)
+  if conf.CHAT_TO_RESPOND_IN == 3 then
     return team_chat
   end
-  return c.CHAT_TO_RESPOND_IN == 2
+  return conf.CHAT_TO_RESPOND_IN == 2
 end
 
 function addPrefix(message)
@@ -425,8 +425,8 @@ local function msgHasCommand(msg, cmd)
   if not conf.CASE_SENSITIVE then
     cmd = cmd:lower()
   end
-  msg = string.sub(msg, #conf.RESPONSE_PREFIX + 1, #msg)
-  return msg == cmd or msg:find(cmd) and string.sub(msg, #cmd + 1, #cmd + 1) == ' '
+
+  return string.startswith(msg, conf.RESPONSE_PREFIX .. cmd)
 end
 
 local function respondToCommand(msg)
@@ -434,16 +434,19 @@ local function respondToCommand(msg)
     if msgHasCommand(msg.txt, cmd) then
       if type(res) == 'function' then
 
-        local param = string.match(msg.txt, cmd ..' .*')
-        if param ~= nil then
-            param = string.gsub(param, cmd ..' ', '')
+        local params = string.split(msg.txt, ' ')
+
+        table.remove(params, 1)
+
+        if #params == 0 then
+          params = nil
         end
 
-        res = res(msg, conf, param)
+        res = res(msg, conf, params)
       end
 
       if type(res) != 'string' then return end
-      chat.send_message(addPrefix(replaceNames(res, msg.pid)), getChatToRespondIn(msg.tc, conf), true, true)
+      chat.send_message(addPrefix(replaceNames(res, msg.pid)), getChatToRespondIn(msg.tc), true, true)
       return
     end
   end
@@ -461,7 +464,9 @@ local function respondToMessage(msg)
         match = msg.txt:find(replaceNames(trigger, msg.pid))
       end
 
-      if (not match and conf.chat_triggers[name].matchAll) or (match and not conf.chat_triggers[name].matchAll) then break end
+      if (not match and conf.chat_triggers[name].matchAll) or (match and not conf.chat_triggers[name].matchAll) then
+        break
+      end
     end
 
     if match then
@@ -476,7 +481,7 @@ local function respondToMessage(msg)
       end
 
       if type(res) != 'string' then return end
-      chat.send_message(addPrefix(replaceNames(res, msg.pid)), getChatToRespondIn(msg.tc, conf), true, true)
+      chat.send_message(addPrefix(replaceNames(res, msg.pid)), getChatToRespondIn(msg.tc), true, true)
       return
     end
   end
@@ -512,12 +517,12 @@ local function respondToChat(team_chat)
 end
 
 chat.on_message(function(sender_pid, unused, message, team_chat)
-  if sender_pid == players.user() and string.sub(message, 0, #conf.RESPONSE_PREFIX) != conf.RESPONSE_PREFIX then
+  if sender_pid == players.user() and not string.startswith(message, conf.RESPONSE_PREFIX) then
     last_message[#last_message + 1] = message
     index = #last_message + 1
   end
 
-  if not awake or string.sub(message, 0, #conf.RESPONSE_PREFIX) == conf.RESPONSE_PREFIX or not respondToGroup(sender_pid) or not respondToChat(team_chat) then
+  if not awake or string.startswith(message, conf.RESPONSE_PREFIX) or not respondToGroup(sender_pid) or not respondToChat(team_chat) then
     return
   end
 
@@ -534,7 +539,7 @@ chat.on_message(function(sender_pid, unused, message, team_chat)
     util.yield(conf.RESPONSE_DELAY * 1000)
   end
 
-  if string.sub(message, 0, #conf.COMMAND_PREFIX) == conf.COMMAND_PREFIX then
+  if string.startswith(message, conf.COMMAND_PREFIX) then
     respondToCommand(msg)
   else
     respondToMessage(msg)
